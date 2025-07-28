@@ -35,6 +35,13 @@ dependencies {
     implementation(libs.bundles.google.apis)
     implementation(libs.play.services.auth)
     implementation(libs.kotlinx.coroutines.play.services)
+    
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    
+    // Dependency Injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 }

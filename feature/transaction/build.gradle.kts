@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.bundles.lifecycle)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.accompanist.permissions)
     implementation(libs.hilt.android)

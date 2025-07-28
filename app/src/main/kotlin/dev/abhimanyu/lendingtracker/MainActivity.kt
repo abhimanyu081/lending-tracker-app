@@ -5,13 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import dagger.hilt.android.AndroidEntryPoint
+import dev.abhimanyu.lendingtracker.core.design.theme.LendingTrackerTheme
+import dev.abhimanyu.lendingtracker.navigation.LendingTrackerNavigation
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -20,35 +19,18 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LendingTrackerTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Lending Tracker",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                LendingTrackerNavigation(
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Composable
-fun LendingTrackerTheme(content: @Composable () -> Unit) {
-    // Simple theme wrapper for now
-    content()
-}
-
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainActivityPreview() {
     LendingTrackerTheme {
-        Greeting("Lending Tracker")
+        LendingTrackerNavigation()
     }
 }
