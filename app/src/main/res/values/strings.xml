@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">Lending Tracker</string>
+    
+    <!-- Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_add_lend">Add Lend</string>
+    <string name="nav_add_repayment">Add Repayment</string>
+    <string name="nav_person_detail">Person Details</string>
+    
+    <!-- Authentication -->
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="authentication_required">Authentication Required</string>
+    <string name="please_sign_in">Please sign in to continue</string>
+    
+    <!-- Dashboard -->
+    <string name="total_lent">Total Lent</string>
+    <string name="total_repaid">Total Repaid</string>
+    <string name="balance_due">Balance Due</string>
+    <string name="no_transactions">No transactions yet</string>
+    <string name="add_first_transaction">Add your first lending transaction</string>
+    
+    <!-- Transaction Form -->
+    <string name="person_name">Person Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="amount">Amount</string>
+    <string name="date">Date</string>
+    <string name="category">Category</string>
+    <string name="tags">Tags</string>
+    <string name="reason">Reason</string>
+    <string name="note">Note</string>
+    <string name="attachment">Attachment</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Transaction Types -->
+    <string name="lend">Lend</string>
+    <string name="repayment">Repayment</string>
+    
+    <!-- Status -->
+    <string name="status_open">Open</string>
+    <string name="status_partial">Partial</string>
+    <string name="status_closed">Closed</string>
+    
+    <!-- Actions -->
+    <string name="call">Call</string>
+    <string name="message">Message</string>
+    <string name="select_contact">Select Contact</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="choose_file">Choose File</string>
+    
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong</string>
+    <string name="error_network">Network error. Please check your connection.</string>
+    <string name="error_authentication">Authentication failed</string>
+    <string name="error_permission_denied">Permission denied</string>
+    <string name="error_invalid_amount">Please enter a valid amount</string>
+    <string name="error_person_name_required">Person name is required</string>
+    
+    <!-- Permissions -->
+    <string name="permission_contacts_rationale">Contact access is needed to select people from your contacts</string>
+    <string name="permission_camera_rationale">Camera access is needed to take photos for attachments</string>
+    <string name="permission_storage_rationale">Storage access is needed to attach files</string>
+    
+    <!-- Content Descriptions -->
+    <string name="cd_profile_picture">Profile picture</string>
+    <string name="cd_attachment_image">Attachment image</string>
+    <string name="cd_back_button">Back</string>
+    <string name="cd_menu_button">Menu</string>
+</resources>
