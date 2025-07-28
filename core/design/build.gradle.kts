@@ -38,6 +38,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.coil.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)

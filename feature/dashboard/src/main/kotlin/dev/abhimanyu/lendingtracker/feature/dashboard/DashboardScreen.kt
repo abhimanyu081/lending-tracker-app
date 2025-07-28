@@ -25,8 +25,6 @@ import java.util.*
 @Composable
 fun DashboardScreen(
     onLendMoneyClick: () -> Unit = {},
-    onBorrowMoneyClick: () -> Unit = {},
-    onAddPersonClick: () -> Unit = {},
     onViewHistoryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel()
@@ -75,31 +73,18 @@ fun DashboardScreen(
                         CircularProgressIndicator()
                     }
                 } else {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        SummaryCard(
-                            title = "Total Lent",
-                            amount = "₹${uiState.totalLent}",
-                            subtitle = if (uiState.pendingLent > BigDecimal.ZERO) "₹${uiState.pendingLent} pending" else "All collected",
-                            amountColor = MoneyPositive,
-                            modifier = Modifier.weight(1f)
-                        )
-                        SummaryCard(
-                            title = "Total Borrowed",
-                            amount = "₹${uiState.totalBorrowed}",
-                            subtitle = if (uiState.pendingBorrowed > BigDecimal.ZERO) "₹${uiState.pendingBorrowed} pending" else "All repaid",
-                            amountColor = MoneyNegative,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+                    SummaryCard(
+                        title = "Total Lent",
+                        amount = "₹${uiState.totalLent}",
+                        subtitle = if (uiState.pendingLent > BigDecimal.ZERO) "₹${uiState.pendingLent} pending" else "All collected",
+                        amountColor = MoneyPositive,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
             
             item {
                 if (!uiState.isLoading) {
-                    val totalPending = uiState.pendingLent + uiState.pendingBorrowed
                     SummaryCard(
                         title = "Pending Collections",
                         amount = "₹${uiState.pendingLent}",
@@ -121,47 +106,23 @@ fun DashboardScreen(
             }
             
             item {
-                Row(
+                QuickActionButton(
+                    text = "LEND\nMONEY",
+                    emoji = "💸",
+                    onClick = onLendMoneyClick,
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    QuickActionButton(
-                        text = "LEND\nMONEY",
-                        emoji = "💸",
-                        onClick = onLendMoneyClick,
-                        modifier = Modifier.weight(1f),
-                        isPrimary = true
-                    )
-                    QuickActionButton(
-                        text = "BORROW\nMONEY",
-                        emoji = "💰",
-                        onClick = onBorrowMoneyClick,
-                        modifier = Modifier.weight(1f),
-                        isPrimary = false
-                    )
-                }
+                    isPrimary = true
+                )
             }
             
             item {
-                Row(
+                QuickActionButton(
+                    text = "VIEW\nHISTORY",
+                    emoji = "📋",
+                    onClick = onViewHistoryClick,
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    QuickActionButton(
-                        text = "ADD\nPERSON",
-                        emoji = "👤",
-                        onClick = onAddPersonClick,
-                        modifier = Modifier.weight(1f),
-                        isPrimary = false
-                    )
-                    QuickActionButton(
-                        text = "VIEW\nHISTORY",
-                        emoji = "📋",
-                        onClick = onViewHistoryClick,
-                        modifier = Modifier.weight(1f),
-                        isPrimary = false
-                    )
-                }
+                    isPrimary = false
+                )
             }
             
             // Recent Transactions Section

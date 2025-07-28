@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.abhimanyu.lendingtracker.core.design.theme.LendingTrackerTheme
+import dev.abhimanyu.lendingtracker.core.design.contact.rememberContactPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,8 +185,19 @@ fun AddPersonForm(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            // Contact picker for importing contact info
+            val contactPicker = rememberContactPicker(
+                onContactSelected = { contact ->
+                    name = contact.name
+                    phone = contact.phone
+                },
+                onPermissionDenied = {
+                    // Handle permission denied - could show a snackbar
+                }
+            )
+            
             OutlinedButton(
-                onClick = { /* TODO: Import from contacts */ },
+                onClick = { contactPicker.launchContactPicker() },
                 modifier = Modifier.weight(1f)
             ) {
                 Text("Import Contact")

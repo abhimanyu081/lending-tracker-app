@@ -7,6 +7,7 @@ import dev.abhimanyu.lendingtracker.core.domain.model.Person
 import dev.abhimanyu.lendingtracker.core.domain.model.TransactionType
 import dev.abhimanyu.lendingtracker.core.domain.repository.PersonRepository
 import dev.abhimanyu.lendingtracker.core.domain.usecase.person.GetAllPersonsUseCase
+import dev.abhimanyu.lendingtracker.core.domain.usecase.person.AddPersonUseCase
 import dev.abhimanyu.lendingtracker.core.domain.usecase.transaction.AddTransactionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,7 @@ data class AddTransactionUiState(
 class AddTransactionViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getAllPersonsUseCase: GetAllPersonsUseCase,
+    private val addPersonUseCase: AddPersonUseCase,
     private val personRepository: PersonRepository
 ) : ViewModel() {
     
@@ -51,20 +53,32 @@ class AddTransactionViewModel @Inject constructor(
         purpose: String? = null,
         interestRate: String? = null,
         dueDate: String? = null,
-        notes: String? = null
+        notes: String? = null,
+        personPhone: String? = null
     ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             
-            // Find person
+            // Find person or create if doesn't exist
             val person = _uiState.value.persons.find { it.name.equals(personName, ignoreCase = true) }
             val personId = person?.id ?: run {
-                // Show clear error message
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    errorMessage = "Person '$personName' not found. Please add them first using 'ADD PERSON' button."
-                )
-                return@launch
+                // Auto-create person from contact info
+                try {
+                    val newPersonResult = addPersonUseCase(
+                        name = personName,
+                        phone = personPhone ?: "",
+                        email = "",
+                        address = "",
+                        notes = "Added from contact picker"
+                    )
+                    newPersonResult.getOrThrow()
+                } catch (e: Exception) {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to create person: ${e.message}"
+                    )
+                    return@launch
+                }
             }
             
             addTransactionUseCase(

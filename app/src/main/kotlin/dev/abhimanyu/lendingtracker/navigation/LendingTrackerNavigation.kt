@@ -8,8 +8,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dev.abhimanyu.lendingtracker.core.common.navigation.LendingTrackerDestinations
 import dev.abhimanyu.lendingtracker.feature.dashboard.DashboardScreen
-import dev.abhimanyu.lendingtracker.feature.person.AddPersonScreen
-import dev.abhimanyu.lendingtracker.feature.transaction.BorrowMoneyScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.LendMoneyScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.TransactionHistoryScreen
 
@@ -28,12 +26,6 @@ fun LendingTrackerNavigation(
                 onLendMoneyClick = {
                     navController.navigate(LendingTrackerDestinations.LEND_MONEY)
                 },
-                onBorrowMoneyClick = {
-                    navController.navigate(LendingTrackerDestinations.BORROW_MONEY)
-                },
-                onAddPersonClick = {
-                    navController.navigate(LendingTrackerDestinations.ADD_PERSON)
-                },
                 onViewHistoryClick = {
                     navController.navigate(LendingTrackerDestinations.TRANSACTION_HISTORY)
                 }
@@ -42,22 +34,6 @@ fun LendingTrackerNavigation(
         
         composable(LendingTrackerDestinations.LEND_MONEY) {
             LendMoneyScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        
-        composable(LendingTrackerDestinations.BORROW_MONEY) {
-            BorrowMoneyScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-        
-        composable(LendingTrackerDestinations.ADD_PERSON) {
-            AddPersonScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

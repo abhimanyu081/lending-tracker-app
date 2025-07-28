@@ -19,6 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.abhimanyu.lendingtracker.core.design.theme.LendingTrackerTheme
 import dev.abhimanyu.lendingtracker.core.domain.model.TransactionType
+import dev.abhimanyu.lendingtracker.core.design.contact.rememberContactPicker
+import dev.abhimanyu.lendingtracker.core.design.components.ContactPickerButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +64,7 @@ fun BorrowMoneyForm(
     modifier: Modifier = Modifier
 ) {
     var personName by remember { mutableStateOf("") }
+    var personPhone by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var purpose by remember { mutableStateOf("") }
     var dueDate by remember { mutableStateOf("") }
@@ -116,17 +119,38 @@ fun BorrowMoneyForm(
         }
         
         // Person Selection
-        OutlinedTextField(
-            value = personName,
-            onValueChange = { personName = it },
-            label = { Text("Lender Name") },
-            placeholder = { Text("Who are you borrowing from?") },
-            leadingIcon = {
-                Icon(Icons.Default.Person, contentDescription = null)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = personName,
+                onValueChange = { personName = it },
+                label = { Text("Lender Name") },
+                placeholder = { Text("Who are you borrowing from?") },
+                leadingIcon = {
+                    Icon(Icons.Default.Person, contentDescription = null)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            
+            // Contact picker button
+            val contactPicker = rememberContactPicker(
+                onContactSelected = { contact ->
+                    personName = contact.name
+                    personPhone = contact.phone
+                },
+                onPermissionDenied = {
+                    // Handle permission denied - could show a snackbar
+                }
+            )
+            
+            ContactPickerButton(
+                onClick = { contactPicker.launchContactPicker() },
+                modifier = Modifier.fillMaxWidth(),
+                text = "Select from Contacts"
+            )
+        }
         
         // Amount
         OutlinedTextField(
@@ -214,7 +238,8 @@ fun BorrowMoneyForm(
                         purpose = purpose,
                         interestRate = interestRate,
                         dueDate = dueDate,
-                        notes = notes
+                        notes = notes,
+                        personPhone = personPhone
                     )
                 },
                 modifier = Modifier.weight(1f),
