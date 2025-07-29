@@ -10,6 +10,7 @@ import dev.abhimanyu.lendingtracker.core.common.navigation.LendingTrackerDestina
 import dev.abhimanyu.lendingtracker.feature.dashboard.DashboardScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.LendMoneyScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.RepaymentScreen
+import dev.abhimanyu.lendingtracker.feature.person.PersonDetailScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.TransactionHistoryScreen
 
 @Composable
@@ -30,6 +31,9 @@ fun LendingTrackerNavigation(
                 onRecordRepaymentClick = {
                     navController.navigate(LendingTrackerDestinations.RECORD_REPAYMENT)
                 },
+                onPersonClick = { personId, personName ->
+                    navController.navigate("${LendingTrackerDestinations.PERSON_DETAIL}/$personId/$personName")
+                },
                 onViewHistoryClick = {
                     navController.navigate(LendingTrackerDestinations.TRANSACTION_HISTORY)
                 }
@@ -46,6 +50,18 @@ fun LendingTrackerNavigation(
         
         composable(LendingTrackerDestinations.RECORD_REPAYMENT) {
             RepaymentScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable("${LendingTrackerDestinations.PERSON_DETAIL}/{personId}/{personName}") { backStackEntry ->
+            val personId = backStackEntry.arguments?.getString("personId")?.toLongOrNull() ?: 0L
+            val personName = backStackEntry.arguments?.getString("personName") ?: ""
+            PersonDetailScreen(
+                personId = personId,
+                personName = personName,
                 onNavigateBack = {
                     navController.popBackStack()
                 }

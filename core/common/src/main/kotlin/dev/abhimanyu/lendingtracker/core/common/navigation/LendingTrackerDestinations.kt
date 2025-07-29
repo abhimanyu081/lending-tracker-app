@@ -4,6 +4,7 @@ object LendingTrackerDestinations {
     const val DASHBOARD = "dashboard"
     const val LEND_MONEY = "lend_money"
     const val RECORD_REPAYMENT = "record_repayment"
+    const val PERSON_DETAIL = "person_detail"
     const val TRANSACTION_HISTORY = "transaction_history"
     const val PERSON_LIST = "person_list"
     const val TRANSACTION_DETAILS = "transaction_details/{transactionId}"

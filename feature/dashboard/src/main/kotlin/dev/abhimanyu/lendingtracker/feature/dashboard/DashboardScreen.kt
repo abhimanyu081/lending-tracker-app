@@ -29,6 +29,7 @@ import java.util.*
 fun DashboardScreen(
     onLendMoneyClick: () -> Unit = {},
     onRecordRepaymentClick: () -> Unit = {},
+    onPersonClick: (Long, String) -> Unit = { _, _ -> },
     onViewHistoryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel()
@@ -188,7 +189,9 @@ fun DashboardScreen(
                 items(uiState.personSummaries) { personSummary ->
                     PersonSummaryItem(
                         personSummary = personSummary,
-                        onClick = { /* TODO: Navigate to person detail */ }
+                        onClick = { 
+                            onPersonClick(personSummary.personId, personSummary.personName)
+                        }
                     )
                 }
             }
