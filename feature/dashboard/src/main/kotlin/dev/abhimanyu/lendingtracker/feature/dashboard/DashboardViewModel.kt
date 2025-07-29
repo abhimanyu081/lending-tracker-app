@@ -6,6 +6,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.abhimanyu.lendingtracker.core.domain.model.Transaction
 import dev.abhimanyu.lendingtracker.core.domain.usecase.transaction.GetDashboardDataUseCase
 import dev.abhimanyu.lendingtracker.core.domain.usecase.transaction.DashboardData
+import dev.abhimanyu.lendingtracker.core.domain.usecase.transaction.DeleteTransactionUseCase
+import dev.abhimanyu.lendingtracker.core.domain.usecase.transaction.GetPersonSummariesUseCase
+import dev.abhimanyu.lendingtracker.core.domain.model.PersonSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,12 +23,15 @@ data class DashboardUiState(
     val pendingLent: BigDecimal = BigDecimal.ZERO,
     val pendingBorrowed: BigDecimal = BigDecimal.ZERO,
     val recentTransactions: List<Transaction> = emptyList(),
+    val personSummaries: List<PersonSummary> = emptyList(),
     val errorMessage: String? = null
 )
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    private val getDashboardDataUseCase: GetDashboardDataUseCase
+    private val getDashboardDataUseCase: GetDashboardDataUseCase,
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val getPersonSummariesUseCase: GetPersonSummariesUseCase
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -56,10 +62,31 @@ class DashboardViewModel @Inject constructor(
                 )
             }
         }
+        
+        viewModelScope.launch {
+            getPersonSummariesUseCase().collect { personSummaries ->
+                _uiState.value = _uiState.value.copy(
+                    personSummaries = personSummaries
+                )
+            }
+        }
     }
     
     fun refresh() {
         _uiState.value = _uiState.value.copy(isLoading = true)
         loadDashboardData()
+    }
+    
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            try {
+                deleteTransactionUseCase(transaction)
+                // Data will automatically refresh through the flow
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = "Failed to delete transaction: ${e.message}"
+                )
+            }
+        }
     }
 }

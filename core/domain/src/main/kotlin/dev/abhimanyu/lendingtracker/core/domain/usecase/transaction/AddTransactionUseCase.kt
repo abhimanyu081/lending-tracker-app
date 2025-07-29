@@ -19,7 +19,8 @@ class AddTransactionUseCase @Inject constructor(
         purpose: String? = null,
         interestRate: String? = null,
         dueDate: String? = null,
-        notes: String? = null
+        notes: String? = null,
+        parentTransactionId: Long? = null
     ): Result<Long> {
         return try {
             if (personId <= 0) {
@@ -60,6 +61,7 @@ class AddTransactionUseCase @Inject constructor(
                 interestRate = interestRateDecimal,
                 dueDate = dueDateParsed,
                 notes = notes?.trim()?.takeIf { it.isNotBlank() },
+                parentTransactionId = parentTransactionId,
                 createdAt = Date(),
                 updatedAt = Date()
             )

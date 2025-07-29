@@ -2,6 +2,7 @@ package dev.abhimanyu.lendingtracker.core.data.database.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.math.BigDecimal
 import java.util.Date
@@ -15,6 +16,10 @@ import java.util.Date
             childColumns = ["personId"],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(value = ["personId"]),
+        Index(value = ["parentTransactionId"])
     ]
 )
 data class TransactionEntity(
@@ -23,6 +28,7 @@ data class TransactionEntity(
     val personId: Long,
     val amount: BigDecimal,
     val type: TransactionType,
+    val parentTransactionId: Long? = null,
     val purpose: String? = null,
     val interestRate: BigDecimal? = null,
     val dueDate: Date? = null,
@@ -33,8 +39,9 @@ data class TransactionEntity(
 )
 
 enum class TransactionType {
-    LENT,    // Money you lent to someone
-    BORROWED // Money you borrowed from someone
+    LENT,     // Money you lent to someone
+    BORROWED, // Money you borrowed from someone
+    REPAYMENT // Money received back from a LENT transaction
 }
 
 enum class TransactionStatus {

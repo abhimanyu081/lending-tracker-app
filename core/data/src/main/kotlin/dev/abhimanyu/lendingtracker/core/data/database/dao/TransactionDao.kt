@@ -59,6 +59,7 @@ data class TransactionWithPerson(
     val dueDate: java.util.Date?,
     val notes: String?,
     val status: TransactionStatus,
+    val parentTransactionId: Long?,
     val createdAt: java.util.Date,
     val updatedAt: java.util.Date,
     val personName: String,

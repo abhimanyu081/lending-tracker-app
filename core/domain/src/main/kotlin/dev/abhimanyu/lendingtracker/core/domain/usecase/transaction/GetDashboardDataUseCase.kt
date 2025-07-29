@@ -22,17 +22,22 @@ class GetDashboardDataUseCase @Inject constructor(
 ) {
     operator fun invoke(): Flow<DashboardData> {
         return transactionRepository.getAllTransactions().map { transactions ->
+            // Calculate total amount lent (only LENT transactions)
             val totalLent = transactions
                 .filter { it.type == TransactionType.LENT }
+                .fold(BigDecimal.ZERO) { acc, transaction -> acc + transaction.amount }
+            
+            // Calculate total repayments received (only REPAYMENT transactions)
+            val totalRepayments = transactions
+                .filter { it.type == TransactionType.REPAYMENT }
                 .fold(BigDecimal.ZERO) { acc, transaction -> acc + transaction.amount }
             
             val totalBorrowed = transactions
                 .filter { it.type == TransactionType.BORROWED }
                 .fold(BigDecimal.ZERO) { acc, transaction -> acc + transaction.amount }
             
-            val pendingLent = transactions
-                .filter { it.type == TransactionType.LENT && it.status == TransactionStatus.PENDING }
-                .fold(BigDecimal.ZERO) { acc, transaction -> acc + transaction.amount }
+            // Calculate pending collections (total lent minus total repayments)
+            val pendingLent = totalLent - totalRepayments
             
             val pendingBorrowed = transactions
                 .filter { it.type == TransactionType.BORROWED && it.status == TransactionStatus.PENDING }

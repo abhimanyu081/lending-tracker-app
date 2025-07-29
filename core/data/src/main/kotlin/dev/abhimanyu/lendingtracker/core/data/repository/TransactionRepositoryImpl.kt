@@ -38,6 +38,7 @@ class TransactionRepositoryImpl @Inject constructor(
         val entityType = when (type) {
             TransactionType.LENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.LENT
             TransactionType.BORROWED -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.BORROWED
+            TransactionType.REPAYMENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.REPAYMENT
         }
         return transactionDao.getTransactionsByType(entityType).map { entities ->
             entities.map { it.toDomain() }
@@ -60,6 +61,7 @@ class TransactionRepositoryImpl @Inject constructor(
         val entityType = when (type) {
             TransactionType.LENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.LENT
             TransactionType.BORROWED -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.BORROWED
+            TransactionType.REPAYMENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.REPAYMENT
         }
         return transactionDao.getTotalAmountByType(entityType) ?: BigDecimal.ZERO
     }
@@ -68,6 +70,7 @@ class TransactionRepositoryImpl @Inject constructor(
         val entityType = when (type) {
             TransactionType.LENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.LENT
             TransactionType.BORROWED -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.BORROWED
+            TransactionType.REPAYMENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.REPAYMENT
         }
         return transactionDao.getPendingAmountByType(entityType) ?: BigDecimal.ZERO
     }

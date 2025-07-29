@@ -1,22 +1,25 @@
 package dev.abhimanyu.lendingtracker.feature.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.getValue
 import dev.abhimanyu.lendingtracker.core.design.components.QuickActionButton
 import dev.abhimanyu.lendingtracker.core.design.components.SummaryCard
 import dev.abhimanyu.lendingtracker.core.design.theme.*
 import dev.abhimanyu.lendingtracker.core.domain.model.Transaction
 import dev.abhimanyu.lendingtracker.core.domain.model.TransactionType
+import dev.abhimanyu.lendingtracker.core.domain.model.PersonSummary
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,6 +28,7 @@ import java.util.*
 @Composable
 fun DashboardScreen(
     onLendMoneyClick: () -> Unit = {},
+    onRecordRepaymentClick: () -> Unit = {},
     onViewHistoryClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = hiltViewModel()
@@ -73,25 +77,25 @@ fun DashboardScreen(
                         CircularProgressIndicator()
                     }
                 } else {
-                    SummaryCard(
-                        title = "Total Lent",
-                        amount = "₹${uiState.totalLent}",
-                        subtitle = if (uiState.pendingLent > BigDecimal.ZERO) "₹${uiState.pendingLent} pending" else "All collected",
-                        amountColor = MoneyPositive,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-            
-            item {
-                if (!uiState.isLoading) {
-                    SummaryCard(
-                        title = "Pending Collections",
-                        amount = "₹${uiState.pendingLent}",
-                        subtitle = if (uiState.recentTransactions.isNotEmpty()) "From ${uiState.recentTransactions.distinctBy { it.personName }.size} people" else "No pending collections",
-                        amountColor = MoneyPending,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        SummaryCard(
+                            title = "Total Lent",
+                            amount = "₹${uiState.totalLent}",
+                            subtitle = if (uiState.pendingLent > BigDecimal.ZERO) "₹${uiState.pendingLent} pending" else "All collected",
+                            amountColor = MoneyPositive,
+                            modifier = Modifier.weight(1f)
+                        )
+                        SummaryCard(
+                            title = "Pending Collections",
+                            amount = "₹${uiState.pendingLent}",
+                            subtitle = if (uiState.recentTransactions.isNotEmpty()) "From ${uiState.recentTransactions.distinctBy { it.personName }.size} people" else "No pending",
+                            amountColor = MoneyPending,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
             }
             
@@ -116,13 +120,25 @@ fun DashboardScreen(
             }
             
             item {
-                QuickActionButton(
-                    text = "VIEW\nHISTORY",
-                    emoji = "📋",
-                    onClick = onViewHistoryClick,
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    isPrimary = false
-                )
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    QuickActionButton(
+                        text = "RECORD\nREPAYMENT",
+                        emoji = "💰",
+                        onClick = onRecordRepaymentClick,
+                        modifier = Modifier.weight(1f),
+                        isPrimary = false
+                    )
+                    QuickActionButton(
+                        text = "VIEW\nHISTORY",
+                        emoji = "📋",
+                        onClick = onViewHistoryClick,
+                        modifier = Modifier.weight(1f),
+                        isPrimary = false
+                    )
+                }
             }
             
             // Recent Transactions Section
@@ -135,8 +151,8 @@ fun DashboardScreen(
                 )
             }
             
-            // Real recent transactions
-            if (uiState.recentTransactions.isEmpty() && !uiState.isLoading) {
+            // Person summaries
+            if (uiState.personSummaries.isEmpty() && !uiState.isLoading) {
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -156,12 +172,12 @@ fun DashboardScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "No transactions yet",
+                                text = "No lending history yet",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
-                                text = "Start by adding a person and creating your first transaction",
+                                text = "Start by lending money to someone",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                             )
@@ -169,8 +185,11 @@ fun DashboardScreen(
                     }
                 }
             } else {
-                items(uiState.recentTransactions) { transaction ->
-                    RealTransactionItem(transaction = transaction)
+                items(uiState.personSummaries) { personSummary ->
+                    PersonSummaryItem(
+                        personSummary = personSummary,
+                        onClick = { /* TODO: Navigate to person detail */ }
+                    )
                 }
             }
             
@@ -199,8 +218,11 @@ fun DashboardScreen(
 @Composable
 fun RealTransactionItem(
     transaction: Transaction,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -233,32 +255,89 @@ fun RealTransactionItem(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${transaction.type.name.lowercase().replaceFirstChar { it.uppercase() }} • ${formatTimeAgo(transaction.createdAt)}",
+                    text = "${getTransactionTypeDisplay(transaction.type)} • ${formatTimeAgo(transaction.createdAt)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
+                if (transaction.purpose?.isNotBlank() == true) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Purpose: ${transaction.purpose}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
             }
             
-            Column(
-                horizontalAlignment = Alignment.End
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = "₹${transaction.amount}",
-                    style = MoneyTextStyle,
-                    color = if (transaction.type == TransactionType.LENT) MoneyPositive else MoneyNegative
-                )
-                Text(
-                    text = transaction.status.name.lowercase().replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.labelSmall,
-                    color = when (transaction.status.name) {
-                        "PENDING" -> MoneyPending
-                        "COMPLETED" -> Success
-                        "OVERDUE" -> Error
-                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    }
-                )
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "₹${transaction.amount}",
+                        style = MoneyTextStyle,
+                        color = when (transaction.type) {
+                            TransactionType.LENT -> MoneyPositive
+                            TransactionType.REPAYMENT -> Success
+                            else -> MoneyNegative
+                        }
+                    )
+                    // Show transaction type instead of status for better clarity
+                    Text(
+                        text = when (transaction.type) {
+                            TransactionType.LENT -> "Loan"
+                            TransactionType.REPAYMENT -> "Received"
+                            TransactionType.BORROWED -> "Borrowed"
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = when (transaction.type) {
+                            TransactionType.LENT -> MoneyPending
+                            TransactionType.REPAYMENT -> Success
+                            TransactionType.BORROWED -> MoneyNegative
+                        }
+                    )
+                }
+                
+                IconButton(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete transaction",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
+    }
+    
+    // Delete confirmation dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Transaction") },
+            text = { Text("Are you sure you want to delete this transaction? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteClick()
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -275,6 +354,88 @@ fun formatTimeAgo(date: Date): String {
         diffInDays < 30 -> "${diffInDays / 7} weeks ago"
         diffInDays < 365 -> "${diffInDays / 30} months ago"
         else -> "${diffInDays / 365} years ago"
+    }
+}
+
+// Helper function to display transaction types
+fun getTransactionTypeDisplay(type: TransactionType): String {
+    val display = when (type) {
+        TransactionType.LENT -> "Lent"
+        TransactionType.REPAYMENT -> "Repayment received"
+        TransactionType.BORROWED -> "Borrowed"
+    }
+    println("DEBUG: getTransactionTypeDisplay - Type: $type -> Display: $display")
+    return display
+}
+
+@Composable
+fun PersonSummaryItem(
+    personSummary: PersonSummary,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "👤",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = personSummary.personName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "${personSummary.transactionCount} transactions • ${formatTimeAgo(personSummary.lastTransactionDate)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+                if (personSummary.totalRepaid > BigDecimal.ZERO) {
+                    Text(
+                        text = "Repaid: ₹${personSummary.totalRepaid}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Success
+                    )
+                }
+            }
+            
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "₹${personSummary.netBalance}",
+                    style = MoneyTextStyle,
+                    color = if (personSummary.netBalance > BigDecimal.ZERO) MoneyPending else Success
+                )
+                Text(
+                    text = if (personSummary.netBalance > BigDecimal.ZERO) "Outstanding" else "Fully Repaid",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (personSummary.netBalance > BigDecimal.ZERO) MoneyPending else Success
+                )
+            }
+        }
     }
 }
 

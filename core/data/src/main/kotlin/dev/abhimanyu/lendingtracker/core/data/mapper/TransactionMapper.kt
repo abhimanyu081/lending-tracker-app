@@ -14,7 +14,9 @@ fun TransactionEntity.toDomain(): Transaction {
         type = when (type) {
             dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.LENT -> TransactionType.LENT
             dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.BORROWED -> TransactionType.BORROWED
+            dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.REPAYMENT -> TransactionType.REPAYMENT
         },
+        parentTransactionId = parentTransactionId,
         purpose = purpose,
         interestRate = interestRate,
         dueDate = dueDate,
@@ -39,7 +41,9 @@ fun TransactionWithPerson.toDomain(): Transaction {
         type = when (type) {
             dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.LENT -> TransactionType.LENT
             dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.BORROWED -> TransactionType.BORROWED
+            dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.REPAYMENT -> TransactionType.REPAYMENT
         },
+        parentTransactionId = parentTransactionId,
         purpose = purpose,
         interestRate = interestRate,
         dueDate = dueDate,
@@ -63,7 +67,9 @@ fun Transaction.toEntity(): TransactionEntity {
         type = when (type) {
             TransactionType.LENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.LENT
             TransactionType.BORROWED -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.BORROWED
+            TransactionType.REPAYMENT -> dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionType.REPAYMENT
         },
+        parentTransactionId = parentTransactionId,
         purpose = purpose,
         interestRate = interestRate,
         dueDate = dueDate,

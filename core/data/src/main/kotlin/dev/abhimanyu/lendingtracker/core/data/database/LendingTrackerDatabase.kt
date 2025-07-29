@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import android.content.Context
 import dev.abhimanyu.lendingtracker.core.data.database.converters.BigDecimalConverter
 import dev.abhimanyu.lendingtracker.core.data.database.converters.DateConverter
@@ -17,7 +19,7 @@ import dev.abhimanyu.lendingtracker.core.data.database.entities.TransactionEntit
         PersonEntity::class,
         TransactionEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(
@@ -35,13 +37,23 @@ abstract class LendingTrackerDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: LendingTrackerDatabase? = null
         
+        private val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Add parentTransactionId column to transactions table
+                database.execSQL("ALTER TABLE transactions ADD COLUMN parentTransactionId INTEGER")
+            }
+        }
+        
         fun getDatabase(context: Context): LendingTrackerDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     LendingTrackerDatabase::class.java,
                     DATABASE_NAME
-                ).build()
+                )
+                .addMigrations(MIGRATION_1_2)
+                .fallbackToDestructiveMigration() // For development - removes this in production
+                .build()
                 INSTANCE = instance
                 instance
             }

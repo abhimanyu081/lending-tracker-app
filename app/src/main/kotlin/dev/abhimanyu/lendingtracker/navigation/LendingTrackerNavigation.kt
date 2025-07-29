@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import dev.abhimanyu.lendingtracker.core.common.navigation.LendingTrackerDestinations
 import dev.abhimanyu.lendingtracker.feature.dashboard.DashboardScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.LendMoneyScreen
+import dev.abhimanyu.lendingtracker.feature.transaction.RepaymentScreen
 import dev.abhimanyu.lendingtracker.feature.transaction.TransactionHistoryScreen
 
 @Composable
@@ -26,6 +27,9 @@ fun LendingTrackerNavigation(
                 onLendMoneyClick = {
                     navController.navigate(LendingTrackerDestinations.LEND_MONEY)
                 },
+                onRecordRepaymentClick = {
+                    navController.navigate(LendingTrackerDestinations.RECORD_REPAYMENT)
+                },
                 onViewHistoryClick = {
                     navController.navigate(LendingTrackerDestinations.TRANSACTION_HISTORY)
                 }
@@ -34,6 +38,14 @@ fun LendingTrackerNavigation(
         
         composable(LendingTrackerDestinations.LEND_MONEY) {
             LendMoneyScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(LendingTrackerDestinations.RECORD_REPAYMENT) {
+            RepaymentScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
